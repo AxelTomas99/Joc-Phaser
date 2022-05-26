@@ -7,7 +7,7 @@
 //
 
 
-var vides = 3;
+var vides = 1;
 
 function Hero(game, x, y) {
     // call Phaser.Sprite constructor
@@ -340,19 +340,6 @@ PlayState._onHeroVsEnemy = function (hero, enemy) {
             vides--;
             this.lifeIcon2.kill();
         }else {
-            var gameOver = function(game){}
-            gameOver.prototype = {
-                create: function(){
-                    var style = {
-                        font: "32px Monospace",
-                        fill: "#00ff00",
-                        align: "center"
-                    }
-                    var text = this.game.add.text(this.game.width / 2, this.game.height / 2, "Game Over", style);
-                    text.anchor.set(0.5);
-                }
-            }
-            this.state.add("GameOver", gameOver);
             this.lifeIcon1.kill();
             this.game.state.start("GameOver");
         }
@@ -378,6 +365,9 @@ PlayState._onHeroVsDoor = function (hero, door) {
     this.game.add.tween(hero)
         .to({x: this.door.x, alpha: 0}, 500, null, true)
         .onComplete.addOnce(this._goToNextLevel, this);
+    if (this.level === 1){
+        this.game.state.start("GameOver");
+    }
 };
 
 PlayState._goToNextLevel = function () {
@@ -525,6 +515,66 @@ PlayState._createHud = function () {
     this.hud.position.set(10, 10);
 };
 
+titleScreen = function(game){}
+titleScreen.prototype = {
+    preload: function(){
+        this.game.load.spritesheet("start", "images/start.png", 190, 49);
+        this.game.load.spritesheet("git", "images/github.png", 90, 90);
+    },
+    create: function(){
+        this.game.stage.disableVisibilityChange = true;
+        var style = {
+            font: "48px Monospace",
+            fill: "#00ff00",
+            align: "center"
+        };
+        var style2 = {
+            font: "10px Monospace",
+            fill: "#00ff00",
+        };
+        var text = this.game.add.text(this.game.width / 2, this.game.height / 2 - 100, "Crack Alien", style);
+        var text1 = this.game.add.text(this.game.width / 5, this.game.height / 2 + 300, "Fet per Axel Tomas Altadill", style2);
+        text.anchor.set(0.5);
+        text1.anchor.set(1);
+        var playButton = this.game.add.button(this.game.width / 2 , this.game.height / 2 + 100, "start", this.startGame, this);
+        var playButton1 = this.game.add.button(this.game.width / 2 , this.game.height / 2 + 200, "git", this.gitHub, this);
+        playButton.anchor.set(0.5);
+        playButton1.anchor.set(0.5);
+    },
+    startGame: function(target){
+        this.game.state.start("loading");
+    },
+    gitHub: function (){
+        var s = window.open('https://github.com/AxelTomas99/Joc-Phaser');
+        s.focus();
+    }
+}
+
+
+
+
+gameOver = function(game){}
+gameOver.prototype = {
+    preload: function(){
+        this.game.load.spritesheet("restart", "images/start.png", 190, 49);
+    },
+    create: function(){
+        var style = {
+            font: "32px Monospace",
+            fill: "#00ff00",
+            align: "center"
+        }
+        var text = this.game.add.text(this.game.width / 2, this.game.height / 2, "Game Over", style);
+        text.anchor.set(0.5);
+        var playButton = this.game.add.button(this.game.width / 2 , this.game.height / 2 + 100, "start", this.startGame, this);
+        playButton.anchor.set(0.5);
+    },
+    startGame: function(target){
+        this.game.state.start("loading");
+    }
+}
+
+
 // =============================================================================
 // entry point
 // =============================================================================
@@ -533,5 +583,10 @@ window.onload = function () {
     let game = new Phaser.Game(960, 600, Phaser.AUTO, 'game');
     game.state.add('play', PlayState);
     game.state.add('loading', LoadingState);
-    game.state.start('loading');
+    game.state.add("titleScreen", titleScreen)
+    game.state.add("GameOver", gameOver)
+
+    game.state.start('titleScreen');
+    // this.state.add("GameOver", gameOver);
+
 };
