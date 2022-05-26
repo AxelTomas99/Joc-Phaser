@@ -7,7 +7,7 @@
 //
 
 
-var vides = 1;
+var vides = 3;
 
 function Hero(game, x, y) {
     // call Phaser.Sprite constructor
